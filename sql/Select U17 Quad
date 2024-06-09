@@ -1,0 +1,5 @@
+select RR.PLACE, RR.TIME, RR.BOAT, R.FIRSTNAME, R.LASTNAME
+from rowing_results RR, Rowers R, resultrowers RRS
+where RR.boat = "U17 Coxed Quad Sculls"
+and RR.ID = RRS.RESULTID
+and RRS.ROWERID = R.ROWER_ID

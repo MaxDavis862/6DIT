@@ -6,7 +6,7 @@ column_names = {
     "3":"boatplace",
 }
 
-conn = sqlite3.connect('INTERNAL.db')
+conn = sqlite3.connect('./INTERNAL.db')
 
 cursor = conn.cursor()
 
