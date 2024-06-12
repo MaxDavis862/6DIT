@@ -1,45 +1,113 @@
 import sqlite3
+import datetime
 
 column_names = {
-    "1":"boat",
-    "2":"boattime",
-    "3":"boatplace",
+    "1":"rowers",
+    "2":"time",
+    "3":"place",
 }
 
-conn = sqlite3.connect('./INTERNAL.db')
+rowernames = {
+    '1':'Max Davis',
+    '2':'Jasper Crawford',
+    '3':'Charlie Manser',
+    '4':'Seb Watson',
+    '5':'Harry Lightfoot',
+    '6':'Abbey Pedersen',
+    '7':'Mia Pagan',
+    '8':'McKellar Thornton',
+}
+
+racenames = {
+    "0":"U17 Coxed Quad Sculls",
+    "1":"U16 Coxed Quad Sculls",
+    "2":"U16 Double Sculls",
+
+}
+conn = sqlite3.connect('/Users/maxdavis/Dev/DIT/6DIT/rowing1.db')
 
 cursor = conn.cursor()
 
-def statementbuilder(options):   #
-    columns = ''
-    for i in options:             # iterates over the data from options
-        columns += column_names[i]    #  adds the name of each column to the string saved under columns
-        columns += ','               #   adds a comma after each name of column in the string
-    cols = columns[:len(columns)-1]    #  removes the last character in the line
-    return f'select {cols} from Maxrowing;'
 
-def whole_roster(query):
-    #cursor.execute('select * from basketballdata;')    
-    cursor.execute(query) 
-    wholeroster = cursor.fetchall()
-    ## in here print headers from cursor
-    for i in wholeroster:
-        print (i)
+#SQL Statement to get boat data, the print the statement after the fetchall
+def getrace(race):
+    querystr = f'select RR.PLACE, RR.TIME, R.FIRSTNAME, R.LASTNAME from race_result RR, rowers R, rower_race_results RRR where RR.RACE = \'{racenames[race]}\' and RR.RACE_RESULT_ID = RRR.RACE_RESULT_ID and RRR.ROWER_ID = R.ROWER_ID'
 
-#headings = [description[0] for description in cursor.description]
-#print (headings[1])
+    cursor.execute(querystr)
+    queryresult = cursor.fetchall()
 
-while(True):
-    stat = str(input("What statistic would you like?\n1. Boat\n2. Boat time\n3.Boat place\neg. 1,2,3 "))
-    cols = stat.split(',')
+    duration = str(datetime.timedelta(milliseconds=queryresult[0][1]))
+    print(f'Place: {queryresult[0][0]} \t Time(min:sec:ms): {duration[2:10]}')
+    print(f'Firstname \t Lastname')
+    for row in queryresult:
+        if len(row[2]) <= 6:
+            print(f'{row[2]} \t\t {row[3]}')
+        else:
+            print(f'{row[2]} \t {row[3]}') 
+        
+def getrower(rower):
     
-#if 'key1' in my_dict:
-#    print("blah")
-#else:
-#    print("boo")
+    '''querystr = f'select  R.FIRSTNAME, R.LASTNAME, RR.RACE, RR.PLACE, RR.TIME from race_result RR, rowers R, rower_race_results RRR where R.ROWER_ID = \'{rowernames[rower]}\' and RR.RACE_RESULT_ID = RRR.RACE_RESULT_ID and RRR.ROWER_ID = R.ROWER_ID'''
 
-#    if 1 <= stat <= 7:
-#        input = ["1","2","3"]
+    querystr = f'select  R.FIRSTNAME, R.LASTNAME, RR.RACE, RR.PLACE, RR.TIME from race_result RR, rowers R, rower_race_results RRR where R.ROWER_ID = \'{rower}\' and RR.RACE_RESULT_ID = RRR.RACE_RESULT_ID and RRR.ROWER_ID = R.ROWER_ID'
+
+    cursor.execute(querystr)
+    queryresult = cursor.fetchall()
+
+    print(queryresult)
+
+    '''duration = str(datetime.timedelta(milliseconds=queryresult[0][1]))
+    print(f'Place: {queryresult[0][0]} \t Time(min:sec:ms): {duration[2:10]}')
+    print(f'Firstname \t Lastname')
+    for row in queryresult:
+        if len(row[2]) <= 6:
+            print(f'{row[2]} \t\t {row[3]}')
+        else:
+            print(f'{row[2]} \t {row[3]}') '''
+    
+    
+    '''rowerfinal = cursor.execute('select' + )
+    print(rowerfinal)'''
+
+RB = str.upper(input("Filter data by boatrace or by rower? Use B or R "))
+
+if RB == 'R':
+    rower = str(input("What rower would you like to see results for? \n1 for Max Davis\n2 for Jasper Crawford\n3 for Charlie Manser\n4 for Seb Watson\n5 for Harry Lightfoot\n6 for Abbey Pedersen\n7 for Mia Pagan\n8 for McKellar Thornton "))
+    print('You have selected ' + rowernames[rower])
+    getrower(rower)
+
+elif RB == 'B':
+    VA = str.upper(input("Add or view data? Use A or V "))
+
+if VA == "V":
+    race = str(input("What race would you like to view?\n0 for U17 Quad\n1 for U16 Quad\n2 for U16 Double "))
+    print('You have selected ' + racenames[race])
+    getrace(race)
+
+
+
+elif VA == "A":
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#while(True):
+ #   cols = stat.split(',')
+    
     query = statementbuilder(cols)
     whole_roster(query)
     #break
@@ -49,3 +117,22 @@ while(True):
 conn.close()
 
 
+'''
+def statementbuilder(options):   #
+    columns = ''
+    for i in options:             # iterates over the data from options
+        columns += column_names[i]    #  adds the name of each column to the string saved under columns
+        columns += ','               #   adds a comma after each name of column in the string
+    cols = columns[:len(columns)-1]    #  removes the last character in the line
+    return f'select {cols} from '
+
+def whole_roster(query):
+    #cursor.execute('select * from basketballdata;')    
+    cursor.execute(query) 
+    wholeroster = cursor.fetchall()
+    ## in here print headers from cursor
+    for i in wholeroster:
+        print (i)
+'''
+#headings = [description[0] for description in cursor.description]
+#print (headings[1])

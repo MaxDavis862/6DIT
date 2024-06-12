@@ -1,5 +1,0 @@
-select RR.PLACE, RR.TIME, RR.RACE, R.FIRSTNAME, R.LASTNAME
-from rowing_results RR, Rowers R, resultrowers RRS
-where RR.race = "U16 Coxed Quad Sculls"
-and RR.ID = RRS.RESULTID
-and RRS.ROWERID = R.ROWER_ID
