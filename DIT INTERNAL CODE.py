@@ -95,7 +95,6 @@ def main():
             addrace(race,place,time)
             main()
         elif (option =="ARR"):
-            # select # from rowers, show and prompt to select
             getrowers()
             rower_id = input("select the ROWER_ID value the rower to add to a race ")
             getraceresult()
@@ -112,48 +111,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#while(True):
- #   cols = stat.split(',')
-    
-    '''query = statementbuilder(cols)
-    whole_roster(query)'''
-    #break
-    #else:
-    #    print("Invalid input")
-
 conn.close()
-
-
-'''
-def statementbuilder(options):   #
-    columns = ''
-    for i in options:             # iterates over the data from options
-        columns += column_names[i]    #  adds the name of each column to the string saved under columns
-        columns += ','               #   adds a comma after each name of column in the string
-    cols = columns[:len(columns)-1]    #  removes the last character in the line
-    return f'select {cols} from '
-
-def whole_roster(query):
-    #cursor.execute('select * from basketballdata;')    
-    cursor.execute(query) 
-    wholeroster = cursor.fetchall()
-    ## in here print headers from cursor
-    for i in wholeroster:
-        print (i)
-'''
-#headings = [description[0] for description in cursor.description]
-#print (headings[1])
