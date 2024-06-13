@@ -1,22 +1,22 @@
-import sqlite3
+import sqlite3  
 import datetime
 
-conn = sqlite3.connect('/Users/maxdavis/Dev/DIT/6DIT/rowing1.db')
-cursor = conn.cursor()
+conn = sqlite3.connect('/Users/maxdavis/Dev/DIT/6DIT/rowing1.db')  #establish connection to the database
+cursor = conn.cursor()   #create cursor
 
-#SQL Statement to get boat data, the print the statement after the fetchall
 def getrace(race):
-    #querystr = f'select RR.PLACE, RR.TIME, R.FIRSTNAME, R.LASTNAME from race_result RR, rowers R, rower_race_results RRR where RR.RACE = \'{racenames[race]}\' and RR.RACE_RESULT_ID = RRR.RACE_RESULT_ID and RRR.ROWER_ID = R.ROWER_ID'
+    #race is put into the query using string interpolation, hence the 'f'
     querystr = f'select RR.PLACE, RR.TIME, R.FIRSTNAME, R.LASTNAME from race_result RR, rowers R, rower_race_results RRR where RR.RACE_RESULT_ID = {race} and RR.RACE_RESULT_ID = RRR.RACE_RESULT_ID and RRR.ROWER_ID = R.ROWER_ID'
 
     cursor.execute(querystr)
     queryresult = cursor.fetchall()
 
-    duration = str(datetime.timedelta(milliseconds=queryresult[0][1]))
-    print(f'Place: {queryresult[0][0]} \t Time: (min:sec:ms) {duration[2:10]}')
+    duration = str(datetime.timedelta(milliseconds=queryresult[0][1])) #the race duration is stored as milliseconds in the database so we convert to minutes-seconds-milliseconds using python datetime calculation
+    print(f'Place: {queryresult[0][0]} \t Time: (min:sec:ms) {duration[2:10]}')   #we remove precision after 2 ms values from the duration
     print(f'Firstname \t Lastname')
     for row in queryresult:
-        if len(row[2]) <= 6:
+        # to improve formatting, insert multiple tabs for short names
+        if len(row[2]) <= 6:   
             print(f'{row[2]} \t\t {row[3]}')
         else:
             print(f'{row[2]} \t {row[3]}') 
@@ -36,7 +36,7 @@ def getrower(rower):
 def addrower(firstname,lastname):    
     sqlstr = f"insert into rowers (\"firstname\",\"lastname\") values (\"{firstname}\", \"{lastname}\")"    
     conn.execute(sqlstr)
-    conn.commit()
+    conn.commit()   #commits changes to the database
            
 def addrace(race, place, time):
     sqlstr = f"insert into race_result (\"race\",\"place\",\"time\") values (\"{race}\", {place}, {time})"    
@@ -49,14 +49,14 @@ def addrowertorace(rower_id, race_result_id):
     conn.commit()    
 
 def getrowers():
-    querystr = f'select rower_id, firstname, lastname from rowers'
+    querystr = 'select rower_id, firstname, lastname from rowers'
     cursor.execute(querystr)
     queryresult = cursor.fetchall()
     for row in queryresult:
         print(row)
 
 def getraceresult():
-    querystr = f'select race_result_id, race from race_result'
+    querystr = 'select race_result_id, race from race_result'
     cursor.execute(querystr)
     queryresult = cursor.fetchall()
     for row in queryresult:
@@ -64,7 +64,7 @@ def getraceresult():
 
 def main():    
     print()
-    VA = str.upper(input("Add or view data? Use A or V "))    
+    VA = str.upper(input("Add or view data? Use A or V "))    #.upper changes the string value to uppercase so the comparison works as expected
     if VA == "V":
         RB = str.upper(input("Filter data by race or by rower? Use RACE or ROWER "))        
         if RB == 'ROWER':           
@@ -106,9 +106,6 @@ def main():
             main()
     else:
         print('Not a valid option. Try again')
-        main()        
-
-if __name__ == "__main__":
-    main()
+        main()        #call to main() restarts the function
 
 conn.close()
