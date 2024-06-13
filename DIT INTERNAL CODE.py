@@ -37,7 +37,7 @@ def getrace(race):
     queryresult = cursor.fetchall()
 
     duration = str(datetime.timedelta(milliseconds=queryresult[0][1]))
-    print(f'Place: {queryresult[0][0]} \t Time(min:sec:ms): {duration[2:10]}')
+    print(f'Place: {queryresult[0][0]} \t Time: (min:sec:ms) {duration[2:10]}')
     print(f'Firstname \t Lastname')
     for row in queryresult:
         if len(row[2]) <= 6:
@@ -54,41 +54,59 @@ def getrower(rower):
     cursor.execute(querystr)
     queryresult = cursor.fetchall()
 
-    print(queryresult)
-
-    '''duration = str(datetime.timedelta(milliseconds=queryresult[0][1]))
-    print(f'Place: {queryresult[0][0]} \t Time(min:sec:ms): {duration[2:10]}')
-    print(f'Firstname \t Lastname')
+    #print(queryresult)
+    #milliseconds = int(queryresult[0][1])
+    #duration = str(datetime.timedelta(milliseconds=milliseconds))
+    #duration = str(datetime.timedelta(milliseconds=queryresult[0][1]))
+    #print(f'Place: {queryresult[0][0]} \t Time(min:sec:ms): {duration[2:10]}')
+    
+    print(f'Race: \t\t\t Place: \t Time: (min:sec:ms)')
     for row in queryresult:
         if len(row[2]) <= 6:
-            print(f'{row[2]} \t\t {row[3]}')
+            print(f'{row[2]} \t\t {row[3]} \t\t {row[4]}')
         else:
-            print(f'{row[2]} \t {row[3]}') '''
+            print(f'{row[2]} \t {row[3]} \t\t {row[4]}')
+
+def addrower():
+    '''
+    sql insert
+
+    cursor.execute(sql insert)
     
     
-    '''rowerfinal = cursor.execute('select' + )
-    print(rowerfinal)'''
+    
+    
+    '''
+    
 
-RB = str.upper(input("Filter data by boatrace or by rower? Use B or R "))
 
-if RB == 'R':
+def addrace():
+    'addrace'
+
+
+
+
+VA = str.upper(input("Add or view data? Use A or V "))
+
+if VA == "V":
+    RB = str.upper(input("Filter data by race or by rower? Use RACE or ROWER "))
+    
+if VA == "A":
+    print("add result")
+
+if RB == 'ROWER':
     rower = str(input("What rower would you like to see results for? \n1 for Max Davis\n2 for Jasper Crawford\n3 for Charlie Manser\n4 for Seb Watson\n5 for Harry Lightfoot\n6 for Abbey Pedersen\n7 for Mia Pagan\n8 for McKellar Thornton "))
     print('You have selected ' + rowernames[rower])
     getrower(rower)
 
-elif RB == 'B':
-    VA = str.upper(input("Add or view data? Use A or V "))
-
-if VA == "V":
+if RB == 'RACE':
     race = str(input("What race would you like to view?\n0 for U17 Quad\n1 for U16 Quad\n2 for U16 Double "))
     print('You have selected ' + racenames[race])
     getrace(race)
 
-
-
-elif VA == "A":
     
-
+if RB != "RACE" or "ROWER":
+    print("Invalid input. Try using 'RACE' or 'ROWER' ")
 
 
 
@@ -108,8 +126,8 @@ elif VA == "A":
 #while(True):
  #   cols = stat.split(',')
     
-    query = statementbuilder(cols)
-    whole_roster(query)
+    '''query = statementbuilder(cols)
+    whole_roster(query)'''
     #break
     #else:
     #    print("Invalid input")
