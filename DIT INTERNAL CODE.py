@@ -1,37 +1,13 @@
 import sqlite3
 import datetime
 
-column_names = {
-    "1":"rowers",
-    "2":"time",
-    "3":"place",
-}
-
-rowernames = {
-    '1':'Max Davis',
-    '2':'Jasper Crawford',
-    '3':'Charlie Manser',
-    '4':'Seb Watson',
-    '5':'Harry Lightfoot',
-    '6':'Abbey Pedersen',
-    '7':'Mia Pagan',
-    '8':'McKellar Thornton',
-}
-
-racenames = {
-    "0":"U17 Coxed Quad Sculls",
-    "1":"U16 Coxed Quad Sculls",
-    "2":"U16 Double Sculls",
-
-}
 conn = sqlite3.connect('/Users/maxdavis/Dev/DIT/6DIT/rowing1.db')
-
 cursor = conn.cursor()
-
 
 #SQL Statement to get boat data, the print the statement after the fetchall
 def getrace(race):
-    querystr = f'select RR.PLACE, RR.TIME, R.FIRSTNAME, R.LASTNAME from race_result RR, rowers R, rower_race_results RRR where RR.RACE = \'{racenames[race]}\' and RR.RACE_RESULT_ID = RRR.RACE_RESULT_ID and RRR.ROWER_ID = R.ROWER_ID'
+    #querystr = f'select RR.PLACE, RR.TIME, R.FIRSTNAME, R.LASTNAME from race_result RR, rowers R, rower_race_results RRR where RR.RACE = \'{racenames[race]}\' and RR.RACE_RESULT_ID = RRR.RACE_RESULT_ID and RRR.ROWER_ID = R.ROWER_ID'
+    querystr = f'select RR.PLACE, RR.TIME, R.FIRSTNAME, R.LASTNAME from race_result RR, rowers R, rower_race_results RRR where RR.RACE_RESULT_ID = {race} and RR.RACE_RESULT_ID = RRR.RACE_RESULT_ID and RRR.ROWER_ID = R.ROWER_ID'
 
     cursor.execute(querystr)
     queryresult = cursor.fetchall()
@@ -46,68 +22,95 @@ def getrace(race):
             print(f'{row[2]} \t {row[3]}') 
         
 def getrower(rower):
-    
-    '''querystr = f'select  R.FIRSTNAME, R.LASTNAME, RR.RACE, RR.PLACE, RR.TIME from race_result RR, rowers R, rower_race_results RRR where R.ROWER_ID = \'{rowernames[rower]}\' and RR.RACE_RESULT_ID = RRR.RACE_RESULT_ID and RRR.ROWER_ID = R.ROWER_ID'''
-
     querystr = f'select  R.FIRSTNAME, R.LASTNAME, RR.RACE, RR.PLACE, RR.TIME from race_result RR, rowers R, rower_race_results RRR where R.ROWER_ID = \'{rower}\' and RR.RACE_RESULT_ID = RRR.RACE_RESULT_ID and RRR.ROWER_ID = R.ROWER_ID'
+    cursor.execute(querystr)
+    queryresult = cursor.fetchall()   
+    print(f'Race: \t\t\t Place: \t Time: (min:sec:ms)')
+    for row in queryresult:    
+        duration = str(datetime.timedelta(milliseconds=row[4]))
+        if len(row[2]) <= 6:
+            print(f'{row[2]} \t\t {row[3]} \t\t {duration[2:10]}')
+        else:
+            print(f'{row[2]} \t {row[3]} \t\t {duration[2:10]}')
 
+def addrower(firstname,lastname):    
+    sqlstr = f"insert into rowers (\"firstname\",\"lastname\") values (\"{firstname}\", \"{lastname}\")"    
+    conn.execute(sqlstr)
+    conn.commit()
+           
+def addrace(race, place, time):
+    sqlstr = f"insert into race_result (\"race\",\"place\",\"time\") values (\"{race}\", {place}, {time})"    
+    conn.execute(sqlstr)
+    conn.commit()
+    
+def addrowertorace(rower_id, race_result_id):
+    sqlstr = f"insert into rower_race_results (\"rower_id\",\"race_result_id\") values ({rower_id}, {race_result_id})"    
+    conn.execute(sqlstr)
+    conn.commit()    
+
+def getrowers():
+    querystr = f'select rower_id, firstname, lastname from rowers'
     cursor.execute(querystr)
     queryresult = cursor.fetchall()
-
-    #print(queryresult)
-    #milliseconds = int(queryresult[0][1])
-    #duration = str(datetime.timedelta(milliseconds=milliseconds))
-    #duration = str(datetime.timedelta(milliseconds=queryresult[0][1]))
-    #print(f'Place: {queryresult[0][0]} \t Time(min:sec:ms): {duration[2:10]}')
-    
-    print(f'Race: \t\t\t Place: \t Time: (min:sec:ms)')
     for row in queryresult:
-        if len(row[2]) <= 6:
-            print(f'{row[2]} \t\t {row[3]} \t\t {row[4]}')
+        print(row)
+
+def getraceresult():
+    querystr = f'select race_result_id, race from race_result'
+    cursor.execute(querystr)
+    queryresult = cursor.fetchall()
+    for row in queryresult:
+        print(row)
+
+def main():    
+    print()
+    VA = str.upper(input("Add or view data? Use A or V "))    
+    if VA == "V":
+        RB = str.upper(input("Filter data by race or by rower? Use RACE or ROWER "))        
+        if RB == 'ROWER':           
+            getrowers()
+            rower = str(input("What rower from the above list would you like to see results for? Use the leftmost number. "))            
+            getrower(rower)
+            main()
+        elif RB == 'RACE':
+            getraceresult()
+            race = str(input("What race result from the above list would you like to view? Use the leftmost number. "))    
+            getrace(race)
+            main()
         else:
-            print(f'{row[2]} \t {row[3]} \t\t {row[4]}')
+            print('Not a valid option. Try again.')
+            main()
+    elif VA == "A":    
+        option = str.upper(input("Add Rower (ARO), Add Race (ARA), Add Rower to a Race (ARR)"))
+        print(option)
+        if (option == "ARO"):                   
+            firstname = input("What is the rowers first name? ")
+            lastname = input("What is the rowers last name? ")
+            addrower(firstname,lastname)
+            main()
+        elif (option == "ARA"):
+            race = input("What is the race name? ")
+            place = input("What place did the boat come? ")
+            time = int(input("What time did the boat get? (Please enter in milliseconds e.g. 393320) "))
+            addrace(race,place,time)
+            main()
+        elif (option =="ARR"):
+            # select # from rowers, show and prompt to select
+            getrowers()
+            rower_id = input("select the ROWER_ID value the rower to add to a race ")
+            getraceresult()
+            race_result_id = input("select the race_result_id value the race to add the rower to ")
+            addrowertorace(rower_id,race_result_id)  
+            main()
+        else:
+            print('Not a valid option. Try again')
+            main()
+    else:
+        print('Not a valid option. Try again')
+        main()        
 
-def addrower():
-    '''
-    sql insert
-
-    cursor.execute(sql insert)
-    
-    
-    
-    
-    '''
-    
-
-
-def addrace():
-    'addrace'
-
-
-
-
-VA = str.upper(input("Add or view data? Use A or V "))
-
-if VA == "V":
-    RB = str.upper(input("Filter data by race or by rower? Use RACE or ROWER "))
-    
-if VA == "A":
-    print("add result")
-
-if RB == 'ROWER':
-    rower = str(input("What rower would you like to see results for? \n1 for Max Davis\n2 for Jasper Crawford\n3 for Charlie Manser\n4 for Seb Watson\n5 for Harry Lightfoot\n6 for Abbey Pedersen\n7 for Mia Pagan\n8 for McKellar Thornton "))
-    print('You have selected ' + rowernames[rower])
-    getrower(rower)
-
-if RB == 'RACE':
-    race = str(input("What race would you like to view?\n0 for U17 Quad\n1 for U16 Quad\n2 for U16 Double "))
-    print('You have selected ' + racenames[race])
-    getrace(race)
-
-    
-if RB != "RACE" or "ROWER":
-    print("Invalid input. Try using 'RACE' or 'ROWER' ")
-
+if __name__ == "__main__":
+    main()
 
 
 
