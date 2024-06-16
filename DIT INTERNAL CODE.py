@@ -108,4 +108,6 @@ def main():
         print('Not a valid option. Try again')
         main()        #call to main() restarts the function
 
+main()
+
 conn.close()
